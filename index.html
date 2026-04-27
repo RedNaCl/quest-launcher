@@ -1,141 +1,63 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quest 终极启动器</title>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:#0f0f1a; color:#eee; font-family:system-ui; padding:16px; display:flex; justify-content:center; align-items:center; min-height:100vh; }
-    .card { width:100%; max-width:440px; background:#181a2e; border-radius:24px; padding:28px 20px; }
-    h1 { text-align:center; font-size:28px; margin-bottom:4px; }
-    .sub { text-align:center; color:#999; font-size:13px; margin-bottom:24px; }
-    .control { margin-bottom:18px; }
-    label { display:block; margin-bottom:6px; font-weight:600; }
-    input { width:100%; padding:14px; font-size:18px; background:#262b43; border:1px solid #363c5c; border-radius:12px; color:#fff; outline:none; }
-    input:focus { border-color:#8c6cff; }
-    .preset-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
-    .preset { background:#262b43; padding:12px; border-radius:12px; cursor:pointer; text-align:center; font-size:14px; border:1px solid transparent; transition:0.2s; }
-    .preset:hover, .preset:active { border-color:#8c6cff; background:#2e3455; }
-    .btn { width:100%; padding:16px; font-size:20px; font-weight:bold; background:#8c6cff; border:none; border-radius:14px; color:#fff; cursor:pointer; margin-bottom:12px; }
-    .btn:active { background:#6b4fd9; transform:scale(0.97); }
-    .msg { text-align:center; min-height:24px; font-size:14px; color:#ffb74d; margin-top:6px; }
-    .tip { color:#666; font-size:12px; text-align:center; margin-top:18px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义应用启动器</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        h1 { color: #333; font-size: 1.5rem; margin-bottom: 1.5rem; }
+        .input-group { margin-bottom: 1rem; text-align: left; }
+        label { display: block; font-size: 0.9rem; color: #666; margin-bottom: 0.5rem; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        .launch-btn { background-color: #4CAF50; color: white; border: none; padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: bold; width: 100%; transition: background 0.3s; margin-top: 1rem; }
+        .launch-btn:hover { background-color: #45a049; }
+        .tip { font-size: 0.8rem; color: #999; margin-top: 1rem; }
+    </style>
 </head>
 <body>
+
 <div class="card">
-  <h1>🚀 Quest 启动器</h1>
-  <div class="sub">覆盖 oculus:// / vrshell:// / API</div>
+    <h1>应用启动器</h1>
+    
+    <div class="input-group">
+        <label>应用协议 (Scheme):</label>
+        <input type="text" id="scheme" placeholder="例如: vrzwkquesttool" value="vrzwkquesttool">
+    </div>
 
-  <div class="control">
-    <label>包名</label>
-    <input type="text" id="pkgInput" placeholder="输入包名，如 com.meta.tv">
-  </div>
+    <div class="input-group">
+        <label>启动指令/路径:</label>
+        <input type="text" id="path" placeholder="例如: open" value="open">
+    </div>
 
-  <div class="preset-grid" id="presets"></div>
-
-  <button class="btn" id="launchBtn">启动应用</button>
-  <div class="msg" id="message"></div>
-
-  <div class="tip">✅ 已内置系统包名，点击即可填入<br>⚠️ 若启动无反应，请确认应用已安装</div>
+    <button class="launch-btn" id="launchBtn">立即启动应用</button>
+    
+    <p class="tip">提示：确保您的电脑已安装相关应用并支持该协议。</p>
 </div>
 
 <script>
-  // 常见包名预设（包含系统应用）
-  const presets = [
-    { name:'Beat Saber', pkg:'com.beatgames.beatsaber' },
-    { name:'系统设置', pkg:'com.oculus.vrshell' },
-    { name:'Oculus TV', pkg:'com.oculus.tv' },
-    { name:'浏览器', pkg:'com.oculus.browser' },
-    { name:'应用库', pkg:'com.oculus.library' },
-    { name:'Virtual Desktop', pkg:'com.virtualdesktop.vr' },
-  ];
+    document.getElementById('launchBtn').addEventListener('click', function() {
+        const scheme = document.getElementById('scheme').value.trim();
+        const path = document.getElementById('path').value.trim();
+        
+        if (!scheme) {
+            alert('请输入协议名称！');
+            return;
+        }
 
-  const presetsDiv = document.getElementById('presets');
-  presets.forEach(p => {
-    const d = document.createElement('div');
-    d.className = 'preset';
-    d.textContent = p.name;
-    d.addEventListener('click', () => {
-      document.getElementById('pkgInput').value = p.pkg;
+        // 拼接成完整的深层链接地址
+        const fullUrl = scheme + '://' + path;
+        
+        console.log('正在尝试启动:', fullUrl);
+        
+        // 核心跳转逻辑
+        window.location.href = fullUrl;
+
+        // 如果想在启动后自动关闭网页，可以取消下面代码的注释
+        // setTimeout(() => { window.close(); }, 1000);
     });
-    presetsDiv.appendChild(d);
-  });
-
-  const input = document.getElementById('pkgInput');
-  const btn = document.getElementById('launchBtn');
-  const msg = document.getElementById('message');
-
-  function setMsg(text, color='#ffb74d') {
-    msg.textContent = text;
-    msg.style.color = color;
-    setTimeout(() => msg.textContent='', 4000);
-  }
-
-  async function tryLaunch(pkg) {
-    // 方法1：navigator.oculus.requestAppLaunch (最新 API)
-    if (navigator.oculus && typeof navigator.oculus.requestAppLaunch === 'function') {
-      try {
-        await navigator.oculus.requestAppLaunch(pkg);
-        return true;
-      } catch (e) { console.warn('API 启动失败，尝试备用方案'); }
-    }
-
-    // 方法2：oculus:// 自定义 scheme（最常见的离线可用的方式）
-    const oculusScheme = `oculus://com.oculus.vrshell?command=launch&package_name=${encodeURIComponent(pkg)}`;
-    try {
-      window.location.href = oculusScheme;
-      // 短暂延迟后如果页面未跳转，则认为可能失败
-      await new Promise(r => setTimeout(r, 300));
-      // 这里无法准确判断成功，但多数情况下 scheme 会被系统捕获，页面本身不会变化
-      return true;
-    } catch {}
-
-    // 方法3：vrshell:// 简化 scheme
-    const vrshellScheme = `vrshell://launch?pkg=${encodeURIComponent(pkg)}`;
-    try {
-      window.location.href = vrshellScheme;
-      await new Promise(r => setTimeout(r, 300));
-      return true;
-    } catch {}
-
-    // 方法4：传统 intent:// （仅 HTTPS 可能有效）
-    const intentUrl = `intent://#Intent;action=com.oculus.vrshell.COMMAND;package=com.oculus.vrshell;S.command=launch;S.package_name=${encodeURIComponent(pkg)};end;`;
-    try {
-      window.location.href = intentUrl;
-      await new Promise(r => setTimeout(r, 300));
-      return true;
-    } catch {}
-
-    return false;
-  }
-
-  btn.addEventListener('click', async () => {
-    const pkg = input.value.trim();
-    if (!pkg) {
-      setMsg('❌ 请输入包名', '#ff5252');
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = '启动中...';
-
-    const ok = await tryLaunch(pkg);
-
-    btn.disabled = false;
-    btn.textContent = '启动应用';
-
-    if (ok) {
-      setMsg('✅ 已尝试启动（如果没反应，检查包名或应用是否安装）', '#69f0ae');
-    } else {
-      setMsg('❌ 所有方式均失败，请确认使用 Oculus 浏览器', '#ff5252');
-    }
-  });
-
-  input.addEventListener('keypress', e => {
-    if (e.key === 'Enter') btn.click();
-  });
 </script>
+
 </body>
 </html>
