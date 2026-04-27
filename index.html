@@ -2,277 +2,139 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Quest 应用启动器</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quest 终极启动器</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      background: #1a1a2e;
-      color: #eee;
-      font-family: system-ui, -apple-system, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .container {
-      width: 100%;
-      max-width: 480px;
-      background: #16213e;
-      border-radius: 24px;
-      padding: 32px 24px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    }
-    h1 {
-      text-align: center;
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
-    .subtitle {
-      text-align: center;
-      color: #aaa;
-      margin-bottom: 28px;
-      font-size: 14px;
-    }
-    .input-group {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #ccc;
-    }
-    input {
-      width: 100%;
-      padding: 16px;
-      font-size: 18px;
-      background: #0f3460;
-      border: 2px solid #1a1a4e;
-      border-radius: 14px;
-      color: #fff;
-      outline: none;
-      transition: border 0.2s;
-    }
-    input:focus {
-      border-color: #e94560;
-    }
-    .btn {
-      width: 100%;
-      padding: 16px;
-      font-size: 20px;
-      font-weight: bold;
-      background: #e94560;
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      margin-bottom: 16px;
-    }
-    .btn:active {
-      background: #c23152;
-      transform: scale(0.97);
-    }
-    .btn:disabled {
-      background: #555;
-      cursor: not-allowed;
-    }
-    .history {
-      margin-top: 10px;
-    }
-    .history-title {
-      color: #aaa;
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
-    .history-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .history-item {
-      background: #0f3460;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: border 0.2s;
-    }
-    .history-item:hover {
-      border-color: #e94560;
-    }
-    .clear-btn {
-      background: transparent;
-      color: #888;
-      font-size: 13px;
-      cursor: pointer;
-      border: none;
-      text-decoration: underline;
-      margin-left: 12px;
-    }
-    .warning {
-      margin-top: 20px;
-      text-align: center;
-      color: #ffb74d;
-      font-size: 13px;
-    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#0f0f1a; color:#eee; font-family:system-ui; padding:16px; display:flex; justify-content:center; align-items:center; min-height:100vh; }
+    .card { width:100%; max-width:440px; background:#181a2e; border-radius:24px; padding:28px 20px; }
+    h1 { text-align:center; font-size:28px; margin-bottom:4px; }
+    .sub { text-align:center; color:#999; font-size:13px; margin-bottom:24px; }
+    .control { margin-bottom:18px; }
+    label { display:block; margin-bottom:6px; font-weight:600; }
+    input { width:100%; padding:14px; font-size:18px; background:#262b43; border:1px solid #363c5c; border-radius:12px; color:#fff; outline:none; }
+    input:focus { border-color:#8c6cff; }
+    .preset-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
+    .preset { background:#262b43; padding:12px; border-radius:12px; cursor:pointer; text-align:center; font-size:14px; border:1px solid transparent; transition:0.2s; }
+    .preset:hover, .preset:active { border-color:#8c6cff; background:#2e3455; }
+    .btn { width:100%; padding:16px; font-size:20px; font-weight:bold; background:#8c6cff; border:none; border-radius:14px; color:#fff; cursor:pointer; margin-bottom:12px; }
+    .btn:active { background:#6b4fd9; transform:scale(0.97); }
+    .msg { text-align:center; min-height:24px; font-size:14px; color:#ffb74d; margin-top:6px; }
+    .tip { color:#666; font-size:12px; text-align:center; margin-top:18px; }
   </style>
 </head>
 <body>
-<div class="container">
+<div class="card">
   <h1>🚀 Quest 启动器</h1>
-  <p class="subtitle">输入应用包名，一键启动</p>
+  <div class="sub">覆盖 oculus:// / vrshell:// / API</div>
 
-  <div class="input-group">
-    <label>包名（例如 com.beatgames.beatsaber）</label>
-    <input type="text" id="pkgInput" placeholder="com.example.app" autofocus>
+  <div class="control">
+    <label>包名</label>
+    <input type="text" id="pkgInput" placeholder="输入包名，如 com.meta.tv">
   </div>
+
+  <div class="preset-grid" id="presets"></div>
 
   <button class="btn" id="launchBtn">启动应用</button>
+  <div class="msg" id="message"></div>
 
-  <div class="history" id="historySection" style="display: none;">
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-      <span class="history-title">📋 历史记录</span>
-      <button class="clear-btn" id="clearHistory">清空记录</button>
-    </div>
-    <div class="history-list" id="historyList"></div>
-  </div>
-
-  <p class="warning">⚠️ 请确保在 <b>Oculus 浏览器</b> 中打开此页面，否则无法启动应用。</p>
+  <div class="tip">✅ 已内置系统包名，点击即可填入<br>⚠️ 若启动无反应，请确认应用已安装</div>
 </div>
 
 <script>
-  // ---------- 历史记录管理（localStorage） ----------
-  const STORAGE_KEY = 'quest_launcher_history';
-  let history = [];
+  // 常见包名预设（包含系统应用）
+  const presets = [
+    { name:'Beat Saber', pkg:'com.beatgames.beatsaber' },
+    { name:'系统设置', pkg:'com.oculus.vrshell' },
+    { name:'Oculus TV', pkg:'com.oculus.tv' },
+    { name:'浏览器', pkg:'com.oculus.browser' },
+    { name:'应用库', pkg:'com.oculus.library' },
+    { name:'Virtual Desktop', pkg:'com.virtualdesktop.vr' },
+  ];
 
-  // 从本地读取历史
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      history = JSON.parse(stored);
-    }
-  } catch (e) {
-    history = [];
-  }
-
-  function saveHistory() {
-    // 去重，保留最近10个
-    history = [...new Set(history)].slice(0, 10);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-    renderHistory();
-  }
-
-  function addToHistory(pkg) {
-    if (!pkg) return;
-    // 移到最前面
-    history = history.filter(item => item !== pkg);
-    history.unshift(pkg);
-    saveHistory();
-  }
-
-  function renderHistory() {
-    const section = document.getElementById('historySection');
-    const list = document.getElementById('historyList');
-    if (history.length === 0) {
-      section.style.display = 'none';
-      return;
-    }
-    section.style.display = 'block';
-    list.innerHTML = history.map(pkg => `<span class="history-item" data-pkg="${pkg}">${pkg}</span>`).join('');
-  }
-
-  // 清空历史
-  document.getElementById('clearHistory').addEventListener('click', () => {
-    history = [];
-    saveHistory();
+  const presetsDiv = document.getElementById('presets');
+  presets.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'preset';
+    d.textContent = p.name;
+    d.addEventListener('click', () => {
+      document.getElementById('pkgInput').value = p.pkg;
+    });
+    presetsDiv.appendChild(d);
   });
 
-  // 点击历史项自动填入输入框
-  document.getElementById('historyList').addEventListener('click', (e) => {
-    if (e.target.classList.contains('history-item')) {
-      document.getElementById('pkgInput').value = e.target.dataset.pkg;
-    }
-  });
-
-  renderHistory();
-
-  // ---------- 启动逻辑 ----------
-  const launcher = {
-    // 方法1：navigator.oculus.requestAppLaunch (推荐)
-    async launchViaAPI(pkg) {
-      if (navigator.oculus && typeof navigator.oculus.requestAppLaunch === 'function') {
-        try {
-          await navigator.oculus.requestAppLaunch(pkg);
-          return true; // 启动成功（异步操作）
-        } catch (err) {
-          console.error('API 启动失败:', err);
-          return false;
-        }
-      }
-      return false; // API 不可用
-    },
-
-    // 方法2：回退到 intent:// 链接（需要 HTTPS，file:// 下通常无效）
-    launchViaIntent(pkg) {
-      const intent = `intent://#Intent;action=com.oculus.vrshell.COMMAND;package=com.oculus.vrshell;S.command=launch;S.package_name=${encodeURIComponent(pkg)};end;`;
-      window.location.href = intent;
-      // 给一点时间让浏览器处理，延迟返回
-      return new Promise(resolve => setTimeout(() => resolve(true), 500));
-    }
-  };
-
-  const launchBtn = document.getElementById('launchBtn');
   const input = document.getElementById('pkgInput');
+  const btn = document.getElementById('launchBtn');
+  const msg = document.getElementById('message');
 
-  launchBtn.addEventListener('click', async () => {
+  function setMsg(text, color='#ffb74d') {
+    msg.textContent = text;
+    msg.style.color = color;
+    setTimeout(() => msg.textContent='', 4000);
+  }
+
+  async function tryLaunch(pkg) {
+    // 方法1：navigator.oculus.requestAppLaunch (最新 API)
+    if (navigator.oculus && typeof navigator.oculus.requestAppLaunch === 'function') {
+      try {
+        await navigator.oculus.requestAppLaunch(pkg);
+        return true;
+      } catch (e) { console.warn('API 启动失败，尝试备用方案'); }
+    }
+
+    // 方法2：oculus:// 自定义 scheme（最常见的离线可用的方式）
+    const oculusScheme = `oculus://com.oculus.vrshell?command=launch&package_name=${encodeURIComponent(pkg)}`;
+    try {
+      window.location.href = oculusScheme;
+      // 短暂延迟后如果页面未跳转，则认为可能失败
+      await new Promise(r => setTimeout(r, 300));
+      // 这里无法准确判断成功，但多数情况下 scheme 会被系统捕获，页面本身不会变化
+      return true;
+    } catch {}
+
+    // 方法3：vrshell:// 简化 scheme
+    const vrshellScheme = `vrshell://launch?pkg=${encodeURIComponent(pkg)}`;
+    try {
+      window.location.href = vrshellScheme;
+      await new Promise(r => setTimeout(r, 300));
+      return true;
+    } catch {}
+
+    // 方法4：传统 intent:// （仅 HTTPS 可能有效）
+    const intentUrl = `intent://#Intent;action=com.oculus.vrshell.COMMAND;package=com.oculus.vrshell;S.command=launch;S.package_name=${encodeURIComponent(pkg)};end;`;
+    try {
+      window.location.href = intentUrl;
+      await new Promise(r => setTimeout(r, 300));
+      return true;
+    } catch {}
+
+    return false;
+  }
+
+  btn.addEventListener('click', async () => {
     const pkg = input.value.trim();
     if (!pkg) {
-      alert('请输入包名');
+      setMsg('❌ 请输入包名', '#ff5252');
       return;
     }
 
-    launchBtn.disabled = true;
-    launchBtn.textContent = '启动中...';
+    btn.disabled = true;
+    btn.textContent = '启动中...';
 
-    let success = false;
+    const ok = await tryLaunch(pkg);
 
-    // 优先使用 API
-    success = await launcher.launchViaAPI(pkg);
+    btn.disabled = false;
+    btn.textContent = '启动应用';
 
-    // 如果 API 不可用，尝试 intent 回退（仅在 HTTPS 下有效）
-    if (!success) {
-      success = await launcher.launchViaIntent(pkg);
-    }
-
-    if (success) {
-      // 启动请求已发出（无法得知是否真的成功，但至少流程走完）
-      addToHistory(pkg);
-      // 短暂提示
-      launchBtn.textContent = '已发送启动请求';
-      setTimeout(() => {
-        launchBtn.textContent = '启动应用';
-        launchBtn.disabled = false;
-      }, 1500);
+    if (ok) {
+      setMsg('✅ 已尝试启动（如果没反应，检查包名或应用是否安装）', '#69f0ae');
     } else {
-      alert('启动失败：当前浏览器不支持 Oculus 启动 API。\n请在 Oculus 自带浏览器中打开此页面。');
-      launchBtn.textContent = '启动应用';
-      launchBtn.disabled = false;
+      setMsg('❌ 所有方式均失败，请确认使用 Oculus 浏览器', '#ff5252');
     }
   });
 
-  // 回车也可启动
-  input.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      launchBtn.click();
-    }
+  input.addEventListener('keypress', e => {
+    if (e.key === 'Enter') btn.click();
   });
 </script>
 </body>
